@@ -6,7 +6,11 @@
 
 #include <Adafruit_NeoPixel.h> // Official NeoPixel library
 
+// Button pin
 const int button_pin = 3;
+
+// Potentiometer pin
+const int pot_pin = A0;
 
 // The board pin for the NeoPixel ring
 const int neopixel_pin = 2;
@@ -19,7 +23,7 @@ const int pixel_amount = 12;
 const int pixel_brightness = 20;
 
 // Delay between changes in milliseconds
-const int delay_interval = 100;
+int delay_interval = 100;
 
 // Iterator variables
 int current_pixel = 0;  // Current value
@@ -37,6 +41,9 @@ int button_down = 0;
 
 // Amount of time button is held before something happens
 int debounce_buffer = 60;
+
+// Analog value of potentiometer
+int sensor_value = 0;
 
 // Variables for pause with using Delay()
 unsigned long current_ms = 0;
@@ -66,6 +73,12 @@ void loop()
 {
   // Update millisecond counter
   current_ms = millis();
+
+  // Detect analog value from potentiometer
+  sensor_value = analogRead(A0);
+
+  // Set delay interval to mapped value
+  delay_interval = map(sensor_value, 0, 1023, 80, 10);
 
   // Detect button activity
   reading = digitalRead(button_pin);
