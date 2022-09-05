@@ -56,32 +56,43 @@ void loop()
   // If a delay interval has elapsed
   if (current_ms - previous_ms >= delay_interval)
   {
-    next_value();
+    // Store current milliseconds value
+    previous_ms = current_ms;
+
+    // Proceed to the next NeoPixel
+    next_pixel();
   }
 }
 
-void next_value()
+void next_pixel()
 {
-  // Update the current pixel value and change the iterator depending on rotation
-  current_pixel = (rotation == 0) ? ring_iterator++ : ring_iterator--;
-
-  // Store current milliseconds value
-  previous_ms = current_ms;
-
   // Clear the display
   ring.clear();
   ring.show();
 
-  // Set the current pixel to green
-  ring.setPixelColor(current_pixel, ring.Color(0, pixel_brightness, 0));
+  if (rotation == 0)  // If rotation is set to clockwise
+  {
+    // Update current pixel value and add to iterator
+    current_pixel = ring_iterator++;
+
+    // If iterator is at the end, reset it
+    ring_iterator = (ring_iterator == pixel_amount) ? 0 : ring_iterator;
+
+    // Set the current pixel to green
+    ring.setPixelColor(current_pixel, ring.Color(0, pixel_brightness, 0));
+  }
+  else // If rotation is set to anticlockwise
+  {
+    // Update current pixel value and subtract from iterator
+    current_pixel = ring_iterator--;
+
+    // If iterator is at the start, reset it
+    ring_iterator = (ring_iterator < 0) ? pixel_amount - 1 : ring_iterator;
+
+    // Set the current pixel to blue
+    ring.setPixelColor(current_pixel, ring.Color(0, 0, pixel_brightness));
+  }
 
   // Update the display
   ring.show();
-
-  // If the iterator is at the start or the end of the ring
-  if (ring_iterator < 0 || ring_iterator == pixel_amount)
-  {
-    // Set it to the start or end according to the direction of rotation
-    ring_iterator = (rotation == 0) ? 0 : pixel_amount - 1;
-  }
 }
