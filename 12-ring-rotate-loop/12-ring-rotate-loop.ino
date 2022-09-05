@@ -1,10 +1,15 @@
 /*
- * Code file for use with an Arduino Uno and NeoPixel ring.
- * Light up each NeoPixel, one by one, in a clockwise rotation.
- * Once the end of the ring is reached, loop over.
- */
+   Code file for use with an Arduino Uno and NeoPixel ring.
+   Light up each NeoPixel, one by one, in a clockwise rotation.
+   Once the end of the ring is reached, loop over.
+*/
 
 #include <Adafruit_NeoPixel.h> // Official NeoPixel library
+
+// Direction of rotation
+// 0 = clockwise
+// 1 = anticlockwise
+const int rotation = 0;
 
 // The board pin for the NeoPixel ring
 const int neopixel_pin = 2;
@@ -32,7 +37,8 @@ Adafruit_NeoPixel ring(pixel_amount, neopixel_pin, NEO_GRB + NEO_KHZ800);
 
 void setup()
 {
-  ring.begin();   // Start the ring
+  // Start the ring
+  ring.begin();
 
   // Clear the display
   ring.clear();
@@ -50,23 +56,32 @@ void loop()
   // If a delay interval has elapsed
   if (current_ms - previous_ms >= delay_interval)
   {
-    // Update the current pixel value and increase the iterator
-    current_pixel = ring_iterator++;
+    next_value();
+  }
+}
 
-    // Store current milliseconds value
-    previous_ms = current_ms;
+void next_value()
+{
+  // Update the current pixel value and change the iterator depending on rotation
+  current_pixel = (rotation == 0) ? ring_iterator++ : ring_iterator--;
 
-    // Clear the display
-    ring.clear();
-    ring.show();
+  // Store current milliseconds value
+  previous_ms = current_ms;
 
-    // Set the current pixel to green
-    ring.setPixelColor(current_pixel, ring.Color(0, pixel_brightness, 0));
+  // Clear the display
+  ring.clear();
+  ring.show();
 
-    // Update the display
-    ring.show();
+  // Set the current pixel to green
+  ring.setPixelColor(current_pixel, ring.Color(0, pixel_brightness, 0));
 
-    // If the iterator is at the max amount of pixels, reset it
-    ring_iterator = (ring_iterator == pixel_amount) ? 0 : ring_iterator;
+  // Update the display
+  ring.show();
+
+  // If the iterator is at the start or the end of the ring
+  if (ring_iterator < 0 || ring_iterator == pixel_amount)
+  {
+    // Set it to the start or end according to the direction of rotation
+    ring_iterator = (rotation == 0) ? 0 : pixel_amount - 1;
   }
 }
